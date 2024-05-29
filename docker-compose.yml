@@ -1,60 +1,40 @@
-version: "3.9"
-
 services:
 
-  traefik:
-    image: traefik
-    container_name: traefik
-    restart: always
+  db:
+    image: library/mariadb:11.1
+    container_name: mariadb
     ports:
-      - 80:80
-      - 443:443
-      - 8080:8080
+      - 3306:3306
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-      - .docker/traefik:/etc/traefik:ro
-      - ./certs:/certs:ro
-    command:
-      - "--api.insecure=true"
-      - "--api.dashboard=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.web.address=:80"
-    labels:
-      - traefik.http.routers.traefik_test.rule=Host(`traefik.localhost`)
-      - traefik.http.services.traefik_test.loadbalancer.server.port=8080
-      - traefik.http.middlewares.tls-redirectscheme.redirectscheme.scheme=https
-      - traefik.http.middlewares.tls-redirectscheme.redirectscheme.permanent=true
-      - traefik.http.middlewares.traefik-auth.basicauth.users=${TRAEFIK_BASIC_AUTH}
-      - traefik.http.middlewares.traefik-auth.basicauth.removeheader=true
-      - traefik.http.routers.traefik-ui.middlewares=traefik-auth
-      - traefik.http.routers.traefik_test.middlewares=tls-redirectscheme@docker
-      - traefik.http.routers.traefik_test-secure.rule=Host(`traefik.localhost`)
-      - traefik.http.routers.traefik_test-secure.tls=true
-      - traefik.http.routers.traefik_test-secure.entrypoints=https
+      - /var/www/html/dbtest:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: hello
+    restart: always
     networks:
-      - reverse_proxy
+      - docker-traefik-local-main_reverse_proxy
 
-  portainer:
-    image: portainer/portainer
-    container_name: portainer
+  phpmyadmin:
+    image: phpmyadmin
+    container_name: phpmyadmin
     restart: always
     volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
+      - ./config/config.user.inc.php:/etc/phpmyadmin/config.user.inc.php:ro
+    environment:
+      - PMA_HOST=mariadb
+      - PMA_USER=root
+      - PMA_PASSWORD=hello
+      - UPLOAD_LIMIT=512M
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.portainer.rule=Host(`portainer.localhost`)
-      - traefik.http.routers.portainer.entrypoints=http
+      - traefik.http.routers.phpmyadmin.middlewares=tls-redirectscheme@docker
+      - traefik.http.routers.phpmyadmin.rule=Host(`phpmyadmin.localhost`)
+      - traefik.http.routers.phpmyadmin.entrypoints=http
+      - traefik.http.routers.phpmyadmin-secure.rule=Host(`phpmyadmin.localhost`)
+      - traefik.http.routers.phpmyadmin-secure.tls=true
+      - traefik.http.routers.phpmyadmin-secure.entrypoints=https
     networks:
-      - reverse_proxy
-
-volumes:
-  portainer_data:
+      - docker-traefik-local-main_reverse_proxy
 
 networks:
-  reverse_proxy:
-    driver: bridge
-
+  #folder of the traefik container + _reverse_proxy
+  docker-traefik-local-main_reverse_proxy:
+    external: true

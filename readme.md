@@ -38,7 +38,7 @@ Chemin du certificat root (clé privée et clé publique)
 #### Générer le certificat pour les projets : 
 
 ```bash
-mkcert -cert-file localhost.cert -key-file localhost.key "localhost" "traefik.localhost" "phpmyadmin.localhost" "vetementpro.localhost" "gds.localhost"
+mkcert -cert-file localhost.cert -key-file localhost.key "localhost" "traefik.localhost" "phpmyadmin.localhost" ... etc
 ```
 
 Il faudra supprimer le conteneur traefik afin qu'il prenne les certificats à jour une fois générées.
