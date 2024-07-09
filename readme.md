@@ -29,7 +29,7 @@ mkcert --install
 ```
 
 Si vous êtes sur windows, il faudra générer installer le certificat root sur windows et WSL2.
-La spécificité pour rendre compatible WSL2 et Windows au niveau des certificats sera de copier le certificat root généré sur WSL2 vers windows :
+La spécificité pour rendre compatible WSL2 et Windows au niveau des certificats sera de copier le certificat root généré sur **Windows vers WSL2** et par la suite générer les clés publiques et privées depuis l'instance WSL2
 
 Chemin du certificat root (clé privée et clé publique)
 - WSL2 (Ubuntu) : `/home/{username}/.local/share/mkcert/rootCA.pem` & `/home/user/.local/share/mkcert/rootCA-key.pem`
