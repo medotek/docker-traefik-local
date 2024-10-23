@@ -36,5 +36,5 @@ services:
 
 networks:
   #folder of the traefik container + _reverse_proxy
-  docker-traefik-local-main_reverse_proxy:
+  docker-traefik-local_reverse_proxy:
     external: true
